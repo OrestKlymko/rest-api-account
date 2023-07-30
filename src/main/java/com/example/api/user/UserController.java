@@ -1,10 +1,7 @@
 package com.example.api.user;
 
 
-import com.example.api.user.exception.PasswordEmptyException;
-import com.example.api.user.exception.UserNotFoundException;
-import com.example.api.user.exception.UsernameEmptyException;
-import com.example.api.user.exception.ValidateEmailException;
+import com.example.api.user.exception.*;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +30,18 @@ public class UserController {
 	public ResponseEntity createUser(@RequestBody UserEntity userEntity) {
 		try {
 			return ResponseEntity.ok(userService.registration(userEntity));
-		} catch (PasswordEmptyException | ValidateEmailException | UsernameEmptyException e ){
+		} catch (PasswordEmptyException | ValidateEmailException | UsernameEmptyException | UserAlreadyExistException e ){
+			return ResponseEntity.badRequest().body(e.getMessage());
+		} catch (Exception e){
+			return ResponseEntity.badRequest().body("Something wrong...");
+		}
+	}
+
+	@PostMapping("/update")
+	public ResponseEntity updateUser(@RequestBody UserEntity userEntity) {
+		try {
+			return ResponseEntity.ok(userService.updateUser(userEntity));
+		} catch (ValidateEmailException | UsernameEmptyException | PasswordEmptyException | UserNotFoundException e ){
 			return ResponseEntity.badRequest().body(e.getMessage());
 		} catch (Exception e){
 			return ResponseEntity.badRequest().body("Something wrong...");
